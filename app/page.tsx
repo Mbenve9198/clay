@@ -56,31 +56,23 @@ export default function Home() {
   const [tables, setTables] = useState<Table[]>([])
   const [currentTable, setCurrentTable] = useState<Table | null>(null)
 
-  const handleCreateTable = (name: string) => {
-    const newTable: Table = {
-      id: uuidv4(),
-      name,
-      data: [],
-      columns: defaultColumns,
-    }
-    setTables([...tables, newTable])
-    setCurrentTable(newTable)
-  }
+  const handleCreateTable = (newTable: Table) => {
+    setTables((prevTables) => [...prevTables, newTable]);
+    setCurrentTable(newTable);
+  };
 
   const handleTableSelect = (table: Table) => {
     setCurrentTable(table)
   }
 
-  const handleTableDuplicate = (table: Table) => {
-    const duplicatedTable: Table = {
-      id: uuidv4(),
-      name: `${table.name} (copia)`,
-      data: [...table.data],
-      columns: [...table.columns],
-    }
-    setTables([...tables, duplicatedTable])
-    setCurrentTable(duplicatedTable)
-  }
+  const handleDuplicateTable = (table: Table) => {
+    const duplicatedTable = {
+      ...table,
+      id: crypto.randomUUID(),
+      name: `${table.name} (Copia)`,
+    };
+    setTables((prevTables) => [...prevTables, duplicatedTable]);
+  };
 
   const handleDataImported = (csvData: any[]) => {
     if (!Array.isArray(csvData)) {
@@ -139,9 +131,10 @@ export default function Home() {
 
         <TableManager
           tables={tables}
+          currentTable={currentTable}
           onTableSelect={handleTableSelect}
           onTableCreate={handleCreateTable}
-          onTableDuplicate={handleTableDuplicate}
+          onTableDuplicate={handleDuplicateTable}
         />
 
         {currentTable && (
