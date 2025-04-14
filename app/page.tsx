@@ -2,66 +2,38 @@
 
 import { useState } from "react"
 import { SmartTable, type SmartColumn, type SmartTableItem } from "@/components/smart-table/smart-table"
+import CSVImporter from "@/components/CSVImporter"
 
 // Sample initial data
 const initialData: SmartTableItem[] = [
   {
     id: "1",
-    name: "Acme Corporation",
-    email: "contact@acmecorp.com",
-    website: "https://acmecorp.com",
-    location: "New York, USA",
-    status: "Active",
+    name: "Acme Inc",
+    website: "https://acme.com",
+    email: "contact@acme.com",
+    reviews: [],
+    websiteContent: "",
+    aiEmail: "",
   },
   {
     id: "2",
-    name: "TechGiant Inc.",
-    email: "info@techgiant.com",
-    website: "https://techgiant.com",
-    location: "San Francisco, USA",
-    status: "Active",
-  },
-  {
-    id: "3",
-    name: "Global Solutions Ltd.",
-    email: "hello@globalsolutions.com",
-    website: "https://globalsolutions.com",
-    location: "London, UK",
-    status: "Inactive",
-  },
-  {
-    id: "4",
-    name: "Innovative Designs",
-    email: "contact@innovativedesigns.com",
-    website: "https://innovativedesigns.com",
-    location: "Berlin, Germany",
-    status: "Pending",
-  },
-  {
-    id: "5",
-    name: "Future Tech",
-    email: "info@futuretech.io",
-    website: "https://futuretech.io",
-    location: "Tokyo, Japan",
-    status: "Active",
+    name: "Globex Corp",
+    website: "https://globex.com",
+    email: "info@globex.com",
+    reviews: [],
+    websiteContent: "",
+    aiEmail: "",
   },
 ]
 
-// Initial columns configuration
+// Sample initial columns
 const initialColumns: SmartColumn[] = [
   {
     id: "name",
     type: "text",
-    header: "Name",
+    header: "Company Name",
     accessorKey: "name",
     size: 180,
-  },
-  {
-    id: "email",
-    type: "text",
-    header: "Email",
-    accessorKey: "email",
-    size: 220,
   },
   {
     id: "website",
@@ -71,24 +43,54 @@ const initialColumns: SmartColumn[] = [
     size: 220,
   },
   {
-    id: "location",
+    id: "email",
     type: "text",
-    header: "Location",
-    accessorKey: "location",
+    header: "Email",
+    accessorKey: "email",
+    size: 220,
+  },
+  {
+    id: "reviews",
+    type: "reviews",
+    header: "Reviews",
+    accessorKey: "reviews",
     size: 180,
   },
   {
-    id: "status",
-    type: "text",
-    header: "Status",
-    accessorKey: "status",
-    size: 120,
+    id: "websiteContent",
+    type: "website-content",
+    header: "Website Content",
+    accessorKey: "websiteContent",
+    size: 180,
+  },
+  {
+    id: "aiEmail",
+    type: "ai-email",
+    header: "AI Email",
+    accessorKey: "aiEmail",
+    size: 180,
   },
 ]
 
 export default function Home() {
   const [data, setData] = useState<SmartTableItem[]>(initialData)
   const [columns, setColumns] = useState<SmartColumn[]>(initialColumns)
+
+  const handleDataImported = (csvData: any[]) => {
+    // Converti i dati CSV nel formato della tabella
+    const newData = csvData.map((item, index) => ({
+      id: (data.length + index + 1).toString(),
+      name: item.name || item.Name || item.NAME || "",
+      website: item.website || item.Website || item.WEBSITE || "",
+      email: item.email || item.Email || item.EMAIL || "",
+      reviews: [],
+      websiteContent: "",
+      aiEmail: "",
+    }))
+    
+    // Aggiorna i dati della tabella
+    setData([...data, ...newData])
+  }
 
   return (
     <main className="container mx-auto py-10 px-4">
@@ -100,7 +102,17 @@ export default function Home() {
           </p>
         </div>
 
-        <SmartTable initialData={data} initialColumns={columns} onDataChange={setData} onColumnsChange={setColumns} />
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Importa Dati CSV</h2>
+          <CSVImporter onDataImported={handleDataImported} />
+        </div>
+
+        <SmartTable 
+          initialData={data} 
+          initialColumns={columns} 
+          onDataChange={setData} 
+          onColumnsChange={setColumns} 
+        />
       </div>
     </main>
   )

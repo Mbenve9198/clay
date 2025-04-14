@@ -6,7 +6,11 @@ interface CSVData {
   [key: string]: string;
 }
 
-export default function CSVImporter() {
+interface CSVImporterProps {
+  onDataImported?: (data: CSVData[]) => void;
+}
+
+export default function CSVImporter({ onDataImported }: CSVImporterProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -40,6 +44,12 @@ export default function CSVImporter() {
 
           // Salva i dati nello state per la visualizzazione
           setData(parsedData);
+          
+          // Notifica il componente padre dei nuovi dati
+          if (onDataImported) {
+            onDataImported(parsedData);
+          }
+          
           setSuccess(true);
         },
         error: (error: Error) => {
@@ -55,7 +65,7 @@ export default function CSVImporter() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-white rounded-lg shadow">
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">
           Importa file CSV
